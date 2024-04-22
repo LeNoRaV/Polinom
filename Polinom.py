@@ -2,11 +2,10 @@
 import copy
 class Polinom:
     def __init__(self, coef_, value = 1):
-        if type(coef_)==int: 
+        if type(coef_)==int or type(coef_)==float: 
             coef_list=[0 for i in range(coef_+1)]
             coef_list[-1]=value
             self.coef=coef_list
-      #      print(f'bla bla {self.coef}')
         else: self.coef = coef_
 
     def __init__(self, coef = []):
@@ -14,6 +13,26 @@ class Polinom:
 
     def __add__(self, other):
         sumy = []
+
+        if type(other) != Polinom:
+            other = Polinom([other])
+
+        small = min(len(self.coef),len(other.coef))
+        big = max(len(self.coef),len(other.coef))
+
+        for i in range(small):
+            sumy.append(self.coef[i]+other.coef[i])
+        for i in range(small, big):
+            if len(self.coef)>len(other.coef): sumy.append(self.coef[i])
+            else: sumy.append(other.coef[i])
+        return Polinom(sumy)
+
+    def __radd__(self, other):
+        sumy = []
+
+        if type(other) != Polinom:
+            other = Polinom([other])
+
         small = min(len(self.coef),len(other.coef))
         big = max(len(self.coef),len(other.coef))
 
@@ -26,6 +45,10 @@ class Polinom:
 
     def __sub__(self, other):
         sumy = []
+
+        if type(other) != Polinom:
+            other = Polinom([other])
+
         small = min(len(self.coef),len(other.coef))
         big = max(len(self.coef),len(other.coef))
 
@@ -34,6 +57,22 @@ class Polinom:
         for i in range(small, big):
             if len(self.coef)>len(other.coef): sumy.append(self.coef[i])
             else: sumy.append(-other.coef[i])
+        return Polinom(sumy)
+
+    def __rsub__(self, other):
+        sumy = []
+
+        if type(other) != Polinom:
+            other = Polinom([other])
+
+        small = min(len(self.coef),len(other.coef))
+        big = max(len(self.coef),len(other.coef))
+
+        for i in range(small):
+            sumy.append(-self.coef[i]+other.coef[i])
+        for i in range(small, big):
+            if len(self.coef)>len(other.coef): sumy.append(-self.coef[i])
+            else: sumy.append(other.coef[i])
         return Polinom(sumy)
     
     def __mul__(self,other):
@@ -148,8 +187,9 @@ class Polinom:
         elif self.coef[1]==-1: ans+=str(' - '+'x')
         elif self.coef[1]>0: ans+=str(' + '+str(self.coef[1])+' '+'x')
         elif self.coef[1]<0: ans+=str(' - '+str(abs(self.coef[1]))+' '+'x')
-        if flag==1 and self.coef[1]!=0:
-            ans=ans[3:]
+        if flag==1 and self.coef[1]!=0: 
+            if self.coef[1]<0: ans=ans[1:]
+            else: ans=ans[3:]
             flag=0
 
 
@@ -159,7 +199,8 @@ class Polinom:
             elif self.coef[i]>0: ans+=str(' + '+str(self.coef[i])+' '+'x'+'^'+ str(i))
             elif self.coef[i]<0: ans+=str(' - '+str(abs(self.coef[i]))+' '+'x'+'^'+ str(i))
             if flag==1 and self.coef[i]!=0:
-                ans=ans[3:]
+                if self.coef[1]<0: ans=ans[1:]
+                else: ans=ans[3:]
                 flag=0
 
 
@@ -195,3 +236,24 @@ print('int:', Polinom([1,1,1]).integrate(0,6))
 print('sh:', Polinom([0,1,1]).shift(2))
 print('\n')
 
+one=Polinom([1])
+x=Polinom([0,1])
+
+print('one + x = ', one + x)
+print('one - x = ', one - x)
+print('x + one = ', x + one)
+print('x - one = ', x - one)
+
+p1 = 1 + x
+p2 = 1 - x
+print(p1*p2)
+print(p1+p2)
+print(p1-p2)
+print(p2-p1)
+print(p1**2)
+print(p2**2)
+print((p1*p2)**2)
+print((p1*p2)**2 - p1**2 * p2**2)
+print((p1**10 + 1) % p1)
+print((x**10 - 1) % (x - 1))
+print((x**10 - 1).diff(2))
